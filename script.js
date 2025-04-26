@@ -1,38 +1,37 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Dark mode functionality
+document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize database
+    await db.initialize();
+    
+    // Theme handling
     const themeToggle = document.getElementById('darkModeToggle');
-    
-    // Check for saved theme preference or default to light
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    
-    function updateTheme(newTheme) {
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
+    if (themeToggle) {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
         
-        // If we're in the main window, update the iframe
-        const modal = document.getElementById('newGameModal');
-        if (modal) {
-            const iframe = modal.querySelector('iframe');
-            if (iframe && iframe.contentWindow) {
-                iframe.contentWindow.postMessage({ type: 'themeChange', theme: newTheme }, '*');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Sync theme with modal if open
+            const modal = document.getElementById('newGameModal');
+            if (modal) {
+                const iframe = modal.querySelector('iframe');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({ type: 'themeChange', theme: newTheme }, '*');
+                }
             }
-        }
+        });
     }
-    
-    themeToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        updateTheme(newTheme);
-    });
 
-    // Modal functionality
-    const modal = document.getElementById('newGameModal');
+    // Modal handling
     const newGameBtn = document.getElementById('newGameBtn');
-    const modalOverlay = modal?.querySelector('.modal-overlay');
+    const modal = document.getElementById('newGameModal');
+    
+    if (newGameBtn && modal) {
+        const modalOverlay = modal.querySelector('.modal-overlay');
 
-    // Only setup modal events if we're on the main page
-    if (modal && newGameBtn) {
         newGameBtn.addEventListener('click', () => {
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -45,137 +44,158 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        modalOverlay.addEventListener('click', () => {
-            closeModal();
-        });
-
-        // Handle messages from iframe
-        window.addEventListener('message', (event) => {
-            if (event.data === 'closeModal') {
-                closeModal();
-            } else if (event.data.type === 'gameCreated') {
-                closeModal();
-                addGameToList(event.data.game);
-            }
-        });
-
-        window.closeModal = () => {
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        };
-    }
-
-    // Listen for theme changes if we're in the iframe
-    if (window !== window.parent) {
-        window.addEventListener('message', (event) => {
-            if (event.data.type === 'themeChange') {
-                document.documentElement.setAttribute('data-theme', event.data.theme);
-            }
-        });
-    }
-
-    // Form functionality (only on new-game.html)
-    const form = document.getElementById('gameForm');
-    if (form) {
-        // Price input mask
-        const priceInput = document.getElementById('dailyPrice');
-        
-        function formatPrice(value) {
-            value = value.replace(/\D/g, '');
-            value = (parseInt(value) / 100).toFixed(2);
-            if (isNaN(value)) {
-                return '';
-            }
-            return value;
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', () => {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
         }
+    }
 
-        priceInput.addEventListener('input', (e) => {
-            const cursorPosition = e.target.selectionStart;
-            const oldLength = e.target.value.length;
-            
-            e.target.value = formatPrice(e.target.value);
-            
-            const newLength = e.target.value.length;
-            const newPosition = cursorPosition + (newLength - oldLength);
-            e.target.setSelectionRange(newPosition, newPosition);
-        });
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const gameData = {
-                name: document.getElementById('gameName').value,
-                location: document.getElementById('location').value,
-                weekDay: document.getElementById('weekDay').value,
-                time: document.getElementById('time').value,
-                monthlySpots: parseInt(document.getElementById('monthlySpots').value),
-                dailyPrice: parseFloat(document.getElementById('dailyPrice').value)
-            };
-
+    // Handle messages from iframe
+    window.addEventListener('message', async (event) => {
+        if (event.data === 'closeModal') {
+            const modal = document.getElementById('newGameModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        } else if (event.data.type === 'newGame') {
             try {
-                const submitBtn = form.querySelector('.submit-btn');
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Enviando...';
-                submitBtn.disabled = true;
-
-                // Simulate API call (remove this in production)
-                console.log('Dados enviados:', gameData);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-
-                // Send message to parent window
-                window.parent.postMessage({
-                    type: 'gameCreated',
-                    game: gameData
-                }, '*');
-
-                // Success feedback
-                submitBtn.textContent = '✓ Pelada Cadastrada!';
-                submitBtn.style.backgroundColor = 'var(--success-color)';
-                
-                // Reset form after 2 seconds
-                setTimeout(() => {
-                    form.reset();
-                    submitBtn.textContent = originalText;
-                    submitBtn.style.backgroundColor = '';
-                    submitBtn.disabled = false;
-                    
-                    // Close modal
-                    window.parent.postMessage('closeModal', '*');
-                }, 2000);
-
+                // Save game to Supabase
+                const game = await db.createGame(event.data.game);
+                // Refresh games list
+                await loadGames();
+                // Close modal
+                const modal = document.getElementById('newGameModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
             } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao cadastrar pelada. Por favor, tente novamente.');
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
+                console.error('Error creating game:', error);
+                alert('Erro ao criar pelada. Por favor, tente novamente.');
             }
-        });
-    }
-
-    // Games list functionality
-    function addGameToList(game) {
-        const gamesList = document.getElementById('gamesList');
-        const emptyState = gamesList.querySelector('.empty-state');
-        
-        if (emptyState) {
-            emptyState.remove();
+        } else if (event.data.type === 'updateGame') {
+            try {
+                // Update game in Supabase
+                const game = await db.updateGame(event.data.game.id, event.data.game);
+                // Refresh games list
+                await loadGames();
+                // Close modal
+                const modal = document.getElementById('newGameModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            } catch (error) {
+                console.error('Error updating game:', error);
+                alert('Erro ao atualizar pelada. Por favor, tente novamente.');
+            }
         }
+    });
 
-        const gameCard = document.createElement('div');
-        gameCard.className = 'game-card';
-        gameCard.innerHTML = `
-            <div class="game-header">
-                <h3>${game.name}</h3>
-                <span class="badge">${game.weekDay}</span>
-            </div>
-            <div class="game-info">
-                <p><strong>Local:</strong> ${game.location}</p>
-                <p><strong>Horário:</strong> ${game.time}</p>
-                <p><strong>Vagas Mensalistas:</strong> ${game.monthlySpots}</p>
-                <p><strong>Valor Diarista:</strong> R$ ${game.dailyPrice.toFixed(2)}</p>
-            </div>
-        `;
-        
-        gamesList.insertBefore(gameCard, gamesList.firstChild);
+    // Load and display games
+    async function loadGames() {
+        try {
+            const games = await db.getGames();
+            const gamesContainer = document.querySelector('.games-list');
+            
+            if (!gamesContainer) return;
+            
+            if (games.length === 0) {
+                return;
+            }
+
+            gamesContainer.innerHTML = games.map(game => `
+                <div class="game-card">
+                    <div class="game-header">
+                        <h3>${game.name}</h3>
+                        <div class="game-actions">
+                            <button class="action-btn edit-btn" data-game-id="${game.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" data-game-id="${game.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="location"><strong>Local:</strong> ${game.location}</p>
+                    <p><strong>Dia:</strong> ${game.weekDay}</p>
+                    <p><strong>Horário:</strong> ${game.time}</p>
+                    <p><strong>Mensalidade:</strong> R$ ${game.monthlyFee}</p>
+                    <p><strong>Diária:</strong> R$ ${game.dailyFee}</p>
+                    <button class="join-btn">Participar</button>
+                </div>
+            `).join('');
+
+            // Add event listeners to join buttons
+            document.querySelectorAll('.join-btn').forEach((btn, index) => {
+                btn.addEventListener('click', () => handleJoinGame(games[index]));
+            });
+
+            // Add event listeners to edit buttons
+            document.querySelectorAll('.edit-btn').forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    const gameId = e.currentTarget.dataset.gameId;
+                    const game = games.find(g => g.id === gameId);
+                    if (game) {
+                        handleEditGame(game);
+                    }
+                });
+            });
+
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-btn').forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    const gameId = e.currentTarget.dataset.gameId;
+                    const game = games.find(g => g.id === gameId);
+                    if (game) {
+                        handleDeleteGame(game);
+                    }
+                });
+            });
+
+        } catch (error) {
+            console.error('Error loading games:', error);
+            alert('Erro ao carregar peladas. Por favor, recarregue a página.');
+        }
     }
+
+    async function handleJoinGame(game) {
+        // TODO: Implement join game functionality
+        alert('Em breve você poderá se juntar a esta pelada!');
+    }
+
+    async function handleEditGame(game) {
+        const modal = document.getElementById('newGameModal');
+        const iframe = modal.querySelector('iframe');
+        
+        if (modal && iframe) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Send current theme to iframe
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            iframe.contentWindow.postMessage({ type: 'themeChange', theme: currentTheme }, '*');
+            
+            // Send game data to iframe
+            iframe.contentWindow.postMessage({ type: 'editGame', game }, '*');
+        }
+    }
+
+    async function handleDeleteGame(game) {
+        if (confirm('Tem certeza que deseja excluir esta pelada?')) {
+            try {
+                await db.deleteGame(game.id);
+                await loadGames();
+            } catch (error) {
+                console.error('Error deleting game:', error);
+                alert('Erro ao excluir pelada. Por favor, tente novamente.');
+            }
+        }
+    }
+
+    // Initial load
+    await loadGames();
 });

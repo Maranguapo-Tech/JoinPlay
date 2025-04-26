@@ -9,6 +9,7 @@
     --success-color: #4CAF50;
     --input-border: #ddd;
     --overlay-color: rgba(0, 0, 0, 0.5);
+    --hover-color: rgba(0, 0, 0, 0.05);
 }
 
 [data-theme="dark"] {
@@ -20,6 +21,7 @@
     --success-color: #66BB6A;
     --input-border: #404040;
     --overlay-color: rgba(0, 0, 0, 0.7);
+    --hover-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Dark mode toggle button */
@@ -255,6 +257,7 @@ input:focus, select:focus {
     border-radius: 8px;
     padding: 1.5rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: fadeIn 0.3s ease-out, scaleIn 0.3s ease-out;
 }
 
 .game-card:hover {
@@ -472,6 +475,42 @@ input:focus, select:focus {
     color: var(--text-color);
 }
 
+/* Game Card Actions */
+.game-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    color: var(--text-color);
+    opacity: 0.7;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.action-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    background-color: var(--hover-color);
+}
+
+.edit-btn:hover {
+    color: var(--primary-color);
+}
+
+.delete-btn:hover {
+    color: #ff4444;
+}
+
+.action-btn i {
+    font-size: 1.2rem;
+}
+
 /* Animations */
 @keyframes logoEntrance {
     from {
@@ -487,9 +526,11 @@ input:focus, select:focus {
 @keyframes fadeIn {
     from {
         opacity: 0;
+        transform: translateY(10px);
     }
     to {
         opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -515,6 +556,15 @@ input:focus, select:focus {
     }
 }
 
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 600px) {
     .form-row {
@@ -524,4 +574,13 @@ input:focus, select:focus {
     .container {
         padding: 1rem;
     }
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .action-btn {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .action-btn:hover {
+    background-color: var(--hover-color);
 }

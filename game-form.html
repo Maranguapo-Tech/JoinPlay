@@ -3,33 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova Pelada - JoinPlay</title>
+    <title>Pelada - JoinPlay</title>
     <link rel="stylesheet" href="styles.css">
-    <script>
-        // Initialize theme from localStorage on page load
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-
-        // Listen for theme changes from parent window
-        window.addEventListener('message', (event) => {
-            if (event.data.type === 'themeChange') {
-                document.documentElement.setAttribute('data-theme', event.data.theme);
-            }
-        });
-
-        // Function to close modal
-        window.closeModal = () => {
-            window.parent.postMessage('closeModal', '*');
-        };
-    </script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Config -->
+    <script src="config.js"></script>
+    <!-- Services -->
+    <script src="services/database.js"></script>
+    <!-- Page Script -->
+    <script src="game-form.js"></script>
 </head>
 <body>
     <div class="form-container">
         <form id="gameForm" class="form-card">
             <div class="form-header">
-                <h2>Nova Pelada</h2>
-                <button type="button" class="close-button" onclick="window.closeModal()">&times;</button>
+                <h2 id="formTitle">Nova Pelada</h2>
+                <button type="button" class="close-button" onclick="closeModal()">&times;</button>
             </div>
+
+            <input type="hidden" id="gameId">
 
             <div class="form-group">
                 <label for="gameName">Nome da Pelada</label>
@@ -64,22 +57,18 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="monthlySpots">Vagas Mensalistas</label>
-                    <input type="number" id="monthlySpots" required min="0" placeholder="Ex: 20">
+                    <label for="monthlyFee">Mensalidade (R$)</label>
+                    <input type="number" id="monthlyFee" required min="0" step="0.01" placeholder="0.00">
                 </div>
 
                 <div class="form-group">
-                    <label for="dailyPrice">Valor Diarista</label>
-                    <div class="price-input">
-                        <span class="currency">R$</span>
-                        <input type="text" id="dailyPrice" required placeholder="0.00" inputmode="numeric">
-                    </div>
+                    <label for="dailyFee">Diária (R$)</label>
+                    <input type="number" id="dailyFee" required min="0" step="0.01" placeholder="0.00">
                 </div>
             </div>
 
-            <button type="submit" class="submit-btn">Cadastrar Pelada</button>
+            <button type="submit" class="submit-btn" id="submitBtn">Criar Pelada</button>
         </form>
     </div>
-    <script src="script.js"></script>
 </body>
 </html>
