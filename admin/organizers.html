@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizadores - JoinPlay</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <button id="darkModeToggle" class="theme-toggle" aria-label="Alternar modo escuro">
+        <svg class="sun-icon" viewBox="0 0 24 24" width="24" height="24">
+            <path d="M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-12c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1s1 .45 1 1v2c0 .55-.45 1-1 1zm0 18c-.55 0-1-.45-1-1v-2c0-.55.45-1 1-1s1 .45 1 1v2c0 .55-.45 1-1 1zm8-10h2c.55 0 1 .45 1 1s-.45 1-1 1h-2c-.55 0-1-.45-1-1s.45-1 1-1zM2 13h2c.55 0 1 .45 1 1s-.45 1-1 1H2c-.55 0-1-.45-1-1s.45-1 1-1z"/>
+        </svg>
+        <svg class="moon-icon" viewBox="0 0 24 24" width="24" height="24">
+            <path d="M12 3c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1s-1-.45-1-1V4c0-.55.45-1 1-1zm0 15c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1s1-.45 1-1v-1c0-.55-.45-1-1-1zM4 12c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1h1c.55 0 1-.45 1-1zm19 0c0-.55-.45-1-1-1h-1c-.55 0-1 .45-1 1s.45 1 1 1h1c.55 0 1-.45 1-1z"/>
+        </svg>
+    </button>
+    <div class="container">
+        <header>
+            <h1 class="logo">JoinPlay</h1>
+            <p class="subtitle">Organizadores de Peladas</p>
+        </header>
+        <div class="actions">
+            <button id="addOrganizerBtn" class="primary-btn">
+                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                Novo Organizador
+            </button>
+        </div>
+        <div class="games-list" id="organizersList">
+            <!-- Lista de organizadores (mock) -->
+        </div>
+    </div>
+
+    <!-- Modal Novo Organizador -->
+    <div id="organizerModal" class="modal">
+        <div class="modal-overlay"></div>
+        <iframe src="organizer-form.html" frameborder="0"></iframe>
+    </div>
+
+    <script>
+    // Mock inicial para exibição
+    const mockOrganizers = [];
+
+    function getInitials(name) {
+        return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    }
+
+    function renderOrganizers() {
+        const list = document.getElementById('organizersList');
+        if (!list) return;
+        if (mockOrganizers.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" width="48" height="48">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                    </svg>
+                    <p>Nenhum organizador cadastrado ainda</p>
+                    <button id="emptyAddOrganizerBtn" class="secondary-btn">Cadastrar Primeiro Organizador</button>
+                </div>
+            `;
+            // Adiciona evento ao botão da empty-state
+            setTimeout(() => {
+                const emptyBtn = document.getElementById('emptyAddOrganizerBtn');
+                if (emptyBtn) {
+                    emptyBtn.addEventListener('click', () => {
+                        document.getElementById('addOrganizerBtn').click();
+                    });
+                }
+            }, 0);
+            return;
+        }
+        list.innerHTML = mockOrganizers.map(org => `
+            <div class="game-card" style="display: flex; align-items: center; gap: 1rem;">
+                <div class="organizer-avatar">${getInitials(org.name)}</div>
+                <div class="organizer-info">
+                    <div class="organizer-name">${org.name}</div>
+                    <div class="organizer-contact">${org.email} | ${org.phone}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderOrganizers();
+        const addBtn = document.getElementById('addOrganizerBtn');
+        const modal = document.getElementById('organizerModal');
+        const modalOverlay = modal.querySelector('.modal-overlay');
+
+        addBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+            // Envia o tema atual para o iframe ao abrir
+            const iframe = modal.querySelector('iframe');
+            const theme = document.documentElement.getAttribute('data-theme') || 'light';
+            iframe.contentWindow.postMessage({ type: 'themeChange', theme }, '*');
+        });
+        modalOverlay.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        // Sincroniza tema com iframe ao mudar
+        const observer = new MutationObserver(() => {
+            const theme = document.documentElement.getAttribute('data-theme') || 'light';
+            const iframe = modal.querySelector('iframe');
+            if (iframe && modal.style.display !== 'none') {
+                iframe.contentWindow.postMessage({ type: 'themeChange', theme }, '*');
+            }
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        window.addEventListener('message', (event) => {
+            if (event.data === 'closeModal') {
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    // Dark theme toggle
+    const themeToggle = document.getElementById('darkModeToggle');
+    if (themeToggle) {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+    </script>
+</body>
+</html>

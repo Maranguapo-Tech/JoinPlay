@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Organizador - JoinPlay</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="form-container">
+        <form id="organizerForm" class="form-card">
+            <div class="form-header">
+                <h2 id="formTitle">Novo Organizador</h2>
+                <button type="button" class="close-button" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="organizerName">Nome</label>
+                <input type="text" id="organizerName" required placeholder="Nome do organizador">
+            </div>
+            <div class="form-group">
+                <label for="organizerEmail">E-mail</label>
+                <input type="email" id="organizerEmail" required placeholder="email@exemplo.com">
+            </div>
+            <div class="form-group">
+                <label for="organizerPhone">Telefone</label>
+                <input type="text" id="organizerPhone" required placeholder="(99) 99999-9999">
+            </div>
+            <button type="submit" class="primary-btn" id="submitBtn">Salvar</button>
+        </form>
+    </div>
+    <script>
+    // Sincroniza tema com a página pai
+    window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'themeChange') {
+            document.documentElement.setAttribute('data-theme', event.data.theme);
+        }
+        if (event.data === 'closeModal') {
+            closeModal();
+        }
+    });
+    function closeModal() {
+        window.parent.postMessage('closeModal', '*');
+    }
+    // Previne envio real, só fecha o modal
+    document.getElementById('organizerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        window.parent.postMessage('closeModal', '*');
+    });
+    </script>
+</body>
+</html>
