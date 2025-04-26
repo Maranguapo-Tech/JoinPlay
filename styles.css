@@ -104,6 +104,16 @@ header {
     animation: logoEntrance 1s ease-out;
 }
 
+.logo-img {
+    height: 58px;
+    vertical-align: middle;
+}
+
+.logo-light { display: inline; }
+.logo-dark { display: none; }
+[data-theme="dark"] .logo-light { display: none; }
+[data-theme="dark"] .logo-dark { display: inline; }
+
 .subtitle {
     color: var(--text-color);
     opacity: 0.8;
