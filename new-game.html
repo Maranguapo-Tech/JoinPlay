@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Pelada - JoinPlay</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        // Initialize theme from localStorage on page load
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Listen for theme changes from parent window
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'themeChange') {
+                document.documentElement.setAttribute('data-theme', event.data.theme);
+            }
+        });
+
+        // Function to close modal
+        window.closeModal = () => {
+            window.parent.postMessage('closeModal', '*');
+        };
+    </script>
+</head>
+<body>
+    <div class="form-container">
+        <form id="gameForm" class="form-card">
+            <div class="form-header">
+                <h2>Nova Pelada</h2>
+                <button type="button" class="close-button" onclick="window.closeModal()">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label for="gameName">Nome da Pelada</label>
+                <input type="text" id="gameName" required placeholder="Ex: Pelada dos Amigos">
+            </div>
+
+            <div class="form-group">
+                <label for="location">Local</label>
+                <input type="text" id="location" required placeholder="Ex: Quadra do Clube">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="weekDay">Dia da Semana</label>
+                    <select id="weekDay" required>
+                        <option value="">Selecione</option>
+                        <option value="domingo">Domingo</option>
+                        <option value="segunda">Segunda-feira</option>
+                        <option value="terca">Terça-feira</option>
+                        <option value="quarta">Quarta-feira</option>
+                        <option value="quinta">Quinta-feira</option>
+                        <option value="sexta">Sexta-feira</option>
+                        <option value="sabado">Sábado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="time">Horário</label>
+                    <input type="time" id="time" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="monthlySpots">Vagas Mensalistas</label>
+                    <input type="number" id="monthlySpots" required min="0" placeholder="Ex: 20">
+                </div>
+
+                <div class="form-group">
+                    <label for="dailyPrice">Valor Diarista</label>
+                    <div class="price-input">
+                        <span class="currency">R$</span>
+                        <input type="text" id="dailyPrice" required placeholder="0.00" inputmode="numeric">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Cadastrar Pelada</button>
+        </form>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
