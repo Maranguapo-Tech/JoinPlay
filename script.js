@@ -59,6 +59,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (modal) {
                 modal.classList.remove('active');
                 document.body.style.overflow = '';
+                // Envia mensagem para limpar o formulário
+                const iframe = modal.querySelector('iframe');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('resetForm', '*');
+                }
             }
         } else if (event.data.type === 'newGame') {
             try {
@@ -71,6 +76,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (modal) {
                     modal.classList.remove('active');
                     document.body.style.overflow = '';
+                    // Envia mensagem para limpar o formulário
+                    const iframe = modal.querySelector('iframe');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage('resetForm', '*');
+                    }
                 }
             } catch (error) {
                 console.error('Error creating game:', error);
@@ -120,19 +130,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                             </button>
                         </div>
                     </div>
-                    <p class="location"><strong>Local:</strong> ${game.location}</p>
-                    <p><strong>Dia:</strong> ${game.weekDay}</p>
-                    <p><strong>Horário:</strong> ${game.time}</p>
-                    <p><strong>Mensalidade:</strong> R$ ${game.monthlyFee}</p>
-                    <p><strong>Diária:</strong> R$ ${game.dailyFee}</p>
-                    <button class="join-btn">Participar</button>
+                    <div class="game-info">
+                        <p><strong>Local:</strong> ${game.location}</p>
+                        <p><strong>Dia:</strong> ${game.weekDay}</p>
+                        <p><strong>Horário:</strong> ${game.time}</p>
+                        <p><strong>Mensalistas:</strong> ${game.monthlyPlayers}</p>
+                        <p><strong>Diária:</strong> R$ ${game.dailyFee}</p>
+                    </div>
                 </div>
             `).join('');
-
-            // Add event listeners to join buttons
-            document.querySelectorAll('.join-btn').forEach((btn, index) => {
-                btn.addEventListener('click', () => handleJoinGame(games[index]));
-            });
 
             // Add event listeners to edit buttons
             document.querySelectorAll('.edit-btn').forEach((btn) => {
@@ -160,11 +166,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error loading games:', error);
             alert('Erro ao carregar peladas. Por favor, recarregue a página.');
         }
-    }
-
-    async function handleJoinGame(game) {
-        // TODO: Implement join game functionality
-        alert('Em breve você poderá se juntar a esta pelada!');
     }
 
     async function handleEditGame(game) {

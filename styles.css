@@ -255,7 +255,7 @@ input:focus, select:focus {
 .game-card {
     background: var(--background-color);
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     animation: fadeIn 0.3s ease-out, scaleIn 0.3s ease-out;
 }
@@ -269,12 +269,14 @@ input:focus, select:focus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .game-header h3 {
     color: var(--primary-color);
     font-weight: 600;
+    font-size: 1.1rem;
+    margin: 0;
 }
 
 .badge {
@@ -287,17 +289,22 @@ input:focus, select:focus {
 
 .game-info {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    font-size: 0.9rem;
 }
 
 .game-info p {
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .game-info strong {
     color: var(--text-color);
     opacity: 0.7;
+    font-size: 0.85rem;
 }
 
 .empty-state {
@@ -478,14 +485,14 @@ input:focus, select:focus {
 /* Game Card Actions */
 .game-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
 .action-btn {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.3rem;
     border-radius: 50%;
     transition: all 0.3s ease;
     color: var(--text-color);
@@ -508,7 +515,7 @@ input:focus, select:focus {
 }
 
 .action-btn i {
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 /* Animations */
@@ -573,6 +580,100 @@ input:focus, select:focus {
     
     .container {
         padding: 1rem;
+    }
+
+    .form-card {
+        padding: 1.5rem;
+    }
+
+    .logo {
+        font-size: 2.5rem;
+    }
+
+    .games-list {
+        padding: 1rem;
+    }
+
+    .game-card {
+        padding: 1rem;
+    }
+
+    .game-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .game-info {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .game-info p {
+        font-size: 0.9rem;
+    }
+
+    .primary-btn, .secondary-btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .actions .primary-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal {
+        width: 95%;
+        max-width: none;
+    }
+
+    .profile-container {
+        padding: 1rem;
+    }
+
+    .avatar-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .avatar-wrapper {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .container {
+        padding: 0.5rem;
+    }
+
+    .form-card {
+        padding: 1rem;
+    }
+
+    .logo {
+        font-size: 2rem;
+    }
+
+    .game-card {
+        padding: 0.8rem;
+    }
+
+    .game-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .game-info p {
+        font-size: 0.8rem;
+    }
+
+    .primary-btn, .secondary-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
     }
 }
 
