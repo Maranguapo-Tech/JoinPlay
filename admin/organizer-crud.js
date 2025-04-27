@@ -37,7 +37,6 @@ async function loadOrganizers() {
         emptyState.style.display = 'none';
         list.innerHTML = '<div id="emptyStateOrganizer" class="empty-state-organizer" style="display:none"></div>' + organizers.map(org => `
             <div class="game-card" style="display: flex; align-items: center; gap: 1rem;">
-                <div class="organizer-avatar">${getInitials(org.name)}</div>
                 <div class="organizer-info">
                     <div class="organizer-name">${org.name}</div>
                     <div class="organizer-contact">${org.email} | ${org.phone}</div>
@@ -68,7 +67,17 @@ async function createOrganizer(data) {
 
 // Editar organizador (carrega dados no formulário)
 function editOrganizer(id) {
-    window.open(`organizer-form.html?id=${id}`, 'Editar Organizador', 'width=400,height=500');
+    // Open organizer form in modal instead of new window
+    const modal = document.getElementById('organizerModal');
+    if (modal) {
+        const iframe = modal.querySelector('iframe');
+        iframe.src = `organizer-form.html?id=${id}`;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        // Sync theme with iframe
+        const theme = document.documentElement.getAttribute('data-theme');
+        iframe.contentWindow.postMessage({ type: 'themeChange', theme }, '*');
+    }
 }
 
 // Atualizar organizador

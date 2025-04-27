@@ -6,20 +6,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('email').value = existingProfile.email || '';
     document.getElementById('phone').value = existingProfile.phone || '';
 
-    // Dark mode functionality
-    const themeToggle = document.getElementById('darkModeToggle');
-    
-    // Check for saved theme preference or default to light
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    
-    themeToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-    });
-
     // Phone number formatting
     const phoneInput = document.getElementById('phone');
     

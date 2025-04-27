@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
+<script>
+    // Apply saved or default dark theme immediately
+    document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
+</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organizadores - JoinPlay</title>
-    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -78,11 +82,17 @@
             if (modal) {
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
-                // Sincroniza tema com iframe
                 const iframe = modal.querySelector('iframe');
-                const theme = document.documentElement.getAttribute('data-theme') || 'light';
-                if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({ type: 'themeChange', theme }, '*');
+                if (iframe) {
+                    // Reset src to force reload of default form
+                    iframe.src = 'organizer-form.html';
+                    // After load, clear fields
+                    iframe.onload = () => {
+                        iframe.contentWindow.postMessage('resetForm', '*');
+                        // Sync theme
+                        const theme = document.documentElement.getAttribute('data-theme') || 'light';
+                        iframe.contentWindow.postMessage({ type: 'themeChange', theme }, '*');
+                    };
                 }
             }
         }
@@ -108,11 +118,6 @@
                     iframe.contentWindow.postMessage({ type: 'themeChange', theme: newTheme }, '*');
                 }
             }
-        }
-        // Função para abrir/fechar menu do perfil igual à index.html
-        function toggleProfileMenu() {
-            const menu = document.getElementById('profileMenu');
-            if (menu) menu.classList.toggle('active');
         }
         document.addEventListener('DOMContentLoaded', async () => {
             // Load and display first name in profile buttons
@@ -141,22 +146,6 @@
                     overlay.addEventListener('click', closeOrganizerModal);
                 }
             }
-            // Profile button igual à index.html
-            const profileBtn = document.getElementById('profileBtn');
-            if (profileBtn) {
-                profileBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    toggleProfileMenu();
-                });
-            }
-            document.addEventListener('click', function(e) {
-                const menu = document.getElementById('profileMenu');
-                if (menu && menu.classList.contains('active')) {
-                    if (!e.target.closest('#profileMenu') && !e.target.closest('#profileBtn')) {
-                        menu.classList.remove('active');
-                    }
-                }
-            });
             // Ouve mensagens do organizer-form para atualizar a lista ao salvar ou fechar modal
             window.addEventListener('message', (event) => {
                 if (event.data && event.data.type === 'refreshOrganizers') {
@@ -166,32 +155,9 @@
                     closeOrganizerModal();
                 }
             });
-            // Sincroniza tema em tempo real com o iframe do modal
-            const themeToggle = document.getElementById('darkModeToggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', () => {
-                    const currentTheme = document.documentElement.getAttribute('data-theme');
-                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                    syncThemeWithIframe(newTheme);
-                });
-            }
         });
     </script>
     <script src="organizer-crud.js"></script>
-    <script>
-    // Dark theme toggle
-    const themeToggle = document.getElementById('darkModeToggle');
-    if (themeToggle) {
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
-    }
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const logoutBtn = document.getElementById('logoutBtn');

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
+    <script>
+        // Initialize iframe theme from parent-localStorage
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+    </script>
     <div class="form-container">
         <form id="organizerForm" class="form-card">
             <div class="form-header">
@@ -61,12 +65,23 @@
         return pass;
     }
 
-    // Sincroniza tema com a página pai
+    // Clear form fields and reset to creation mode
+    function clearForm() {
+        document.getElementById('organizerName').value = '';
+        document.getElementById('organizerEmail').value = '';
+        document.getElementById('organizerPhone').value = '';
+        document.getElementById('organizerRole').value = 'member';
+        document.getElementById('formTitle').textContent = 'Novo Organizador';
+        document.getElementById('submitBtn').textContent = 'Salvar';
+    }
+
+    // Handle messages from parent
     window.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'themeChange') {
+        if (event.data === 'resetForm') {
+            clearForm();
+        } else if (event.data && event.data.type === 'themeChange') {
             document.documentElement.setAttribute('data-theme', event.data.theme);
-        }
-        if (event.data === 'closeModal') {
+        } else if (event.data === 'closeModal') {
             closeModal();
         }
     });

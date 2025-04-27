@@ -40,7 +40,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 weekDay: document.getElementById('weekDay').value,
                 time: document.getElementById('time').value,
                 monthlyPlayers: parseInt(document.getElementById('monthlyPlayers').value),
-                dailyFee: parseFloat(document.getElementById('dailyFee').value)
+                dailyFee: parseFloat(document.getElementById('dailyFee').value),
+                renewal_day_of_month: parseInt(document.getElementById('renewalDay').value)
             };
 
             if (gameId) {
@@ -53,10 +54,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 // Create new game
                 gameData.created_at = new Date().toISOString();
-            window.parent.postMessage({
-                type: 'newGame',
-                game: gameData
-            }, '*');
+                window.parent.postMessage({
+                    type: 'newGame',
+                    game: gameData
+                }, '*');
             }
         });
     }
@@ -75,6 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('time').value = game.time;
         document.getElementById('monthlyPlayers').value = game.monthlyPlayers;
         document.getElementById('dailyFee').value = game.dailyFee.toFixed(2);
+        document.getElementById('renewalDay').value = game.renewal_day_of_month;
 
         // Update form title and button
         document.getElementById('formTitle').textContent = 'Editar Pelada';
@@ -90,6 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('time').value = '';
         document.getElementById('monthlyPlayers').value = '';
         document.getElementById('dailyFee').value = '';
+        document.getElementById('renewalDay').value = '';
 
         // Reset form title and button
         document.getElementById('formTitle').textContent = 'Nova Pelada';

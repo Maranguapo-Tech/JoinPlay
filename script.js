@@ -1,3 +1,37 @@
+// Theme initialization and toggle independent of other logic
+function applyThemeToggle() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const themeToggleBtn = document.getElementById('darkModeToggle');
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        });
+    }
+}
+
+// Always initialize theme toggle immediately
+applyThemeToggle();
+
+// Global fallback for theme toggle clicks
+document.body.addEventListener('click', (e) => {
+    const btn = e.target.closest('#darkModeToggle');
+    if (!btn) return;
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    // Sync theme change with any open modal iframe (organizer or game)
+    document.querySelectorAll('.modal.active iframe').forEach(iframe => {
+        if (iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ type: 'themeChange', theme: next }, '*');
+        }
+    });
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize database
     await db.initialize();
@@ -21,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Theme handling
     const themeToggle = document.getElementById('darkModeToggle');
     if (themeToggle) {
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         
         themeToggle.addEventListener('click', () => {
@@ -164,6 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <p><strong>Mensalistas:</strong> ${game.monthlyPlayers}</p>
                         <p><strong>Diária:</strong> R$ ${game.dailyFee}</p>
                         <p><strong>Organizador:</strong> ${game.profiles?.name || ''}</p>
+                        <p><strong>Dia Renovação:</strong> ${game.renewal_day_of_month || '-'}</p>
                     </div>
                 </div>
             `).join('');
