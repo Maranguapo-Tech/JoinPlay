@@ -1,7 +1,16 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize database
     await db.initialize();
-    
+    // Load and display first name in profile buttons
+    try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        const profileData = await db.getProfile(user.id);
+        const firstName = (profileData.name || '').split(' ')[0] || '';
+        document.querySelectorAll('.profile-name').forEach(el => el.textContent = firstName);
+    } catch (e) {
+        console.warn('Could not load profile name', e);
+    }
+
     // Theme handling
     const themeToggle = document.getElementById('darkModeToggle');
     if (themeToggle) {
@@ -110,10 +119,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const games = await db.getGames();
             const gamesContainer = document.querySelector('.games-list');
-
-            console.log("chamou o loadGames()");
-            console.log("Games", games);
-            console.log("gamesContainer", gamesContainer);
             
             if (!gamesContainer) return;
             

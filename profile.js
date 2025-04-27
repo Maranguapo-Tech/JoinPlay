@@ -1,4 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Load logged-in user profile
+    const { data: { user } } = await window.supabaseClient.auth.getUser();
+    const existingProfile = await db.getProfile(user.id);
+    document.getElementById('name').value = existingProfile.name || '';
+    document.getElementById('email').value = existingProfile.email || '';
+    document.getElementById('phone').value = existingProfile.phone || '';
+
     // Dark mode functionality
     const themeToggle = document.getElementById('darkModeToggle');
     

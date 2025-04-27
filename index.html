@@ -14,18 +14,15 @@
     <!-- Services -->
     <script src="services/database.js"></script>
     <!-- Main Script -->
+    <script type="module">
+        import { requireAuth } from './auth-guard.js';
+        document.addEventListener('DOMContentLoaded', async () => {
+            await requireAuth('login.html');
+        });
+    </script>
     <script src="script.js" defer></script>
 </head>
 <body>
-    <script>
-        // Torna o tema escuro padrão
-        let savedTheme = localStorage.getItem('theme');
-        if (!savedTheme) {
-            savedTheme = 'dark';
-            localStorage.setItem('theme', 'dark');
-        }
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    </script>
     <div class="top-actions">
         <button id="backToHomeBtn" class="theme-toggle" aria-label="Voltar para Home" onclick="window.location.href='/'" type="button">
             <i class="fa fa-home"></i>
@@ -40,13 +37,14 @@
         </button>
         <button id="profileBtn" class="theme-toggle profile-toggle" aria-label="Meu perfil" type="button">
             <i class="fa fa-user"></i>
-            <span class="profile-name">Paulo</span>
+            <span class="profile-name"></span>
         </button>
         <div id="profileMenu" class="profile-menu">
             <ul>
-                <li><a href="profile.html">Perfil</a></li>
-                <li><a href="admin/organizers.html">Organizadores</a></li>
-                <li><a href="#">Configurações</a></li>
+                <li><button class="profile-menu-btn" onclick="window.location.href='profile.html'">Perfil</button></li>
+                <li><button class="profile-menu-btn" onclick="window.location.href='admin/organizers.html'">Organizadores</button></li>
+                <li><button class="profile-menu-btn" onclick="alert('Em breve: configurações!')">Configurações</button></li>
+                <li><button id="logoutBtn" class="logout-btn profile-menu-btn">Sair</button></li>
             </ul>
         </div>
     </div>
@@ -72,13 +70,7 @@
 
         <div id="gamesList" class="games-list">
             <!-- Lista de peladas será preenchida via JavaScript -->
-            <div class="empty-state">
-                <svg viewBox="0 0 24 24" width="48" height="48">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-                </svg>
-                <p>Nenhuma pelada cadastrada ainda</p>
-                <button onclick="document.getElementById('newGameBtn').click()" class="secondary-btn">Cadastrar Primeira Pelada</button>
-            </div>
+            <div class="games-list"></div>
         </div>
     </div>
 
@@ -87,5 +79,20 @@
         <div class="modal-overlay"></div>
         <iframe src="game-form.html" frameborder="0"></iframe>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async function() {
+                    if (window.supabaseClient) {
+                        await window.supabaseClient.auth.signOut();
+                        window.location.href = 'login.html';
+                    } else {
+                        alert('Erro ao sair: Supabase não carregado.');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

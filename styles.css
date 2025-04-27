@@ -356,6 +356,22 @@ input:focus, select:focus {
     fill: currentColor;
 }
 
+.empty-state-organizer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+    gap: 1rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.empty-state-organizer svg {
+    fill: currentColor;
+}
+
 /* Modal */
 .modal {
     display: none;
@@ -719,6 +735,53 @@ input:focus, select:focus {
     color: #fff;
 }
 
+/* Botões do menu de perfil */
+.profile-menu-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0.7em 1.2em;
+    color: var(--text-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.profile-menu-btn:hover, .profile-menu-btn:focus {
+    background: var(--hover-color);
+    color: var(--primary-color);
+    outline: none;
+}
+.logout-btn {
+    color: var(--danger-color, #d32f2f);
+}
+.logout-btn:hover, .logout-btn:focus {
+    background: var(--hover-color);
+    color: #fff;
+}
+
+/* Logout button in profile menu */
+.logout-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0.7em 1.2em;
+    color: var(--danger-color, #d32f2f);
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.logout-btn:hover, .profile-menu li .logout-btn:focus {
+    background: var(--hover-color);
+    color: #fff;
+    outline: none;
+}
+
 /* Animations */
 @keyframes logoEntrance {
     from {
@@ -893,4 +956,48 @@ input:focus, select:focus {
 
 .form-card .submit-btn {
     margin-top: 1.5rem;
+}
+
+/* Login & Forgot Password Form: narrower and full-width fields */
+.login-form-container, .forgot-form-container {
+    max-width: 350px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    background: var(--card-background);
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+    animation: cardEntrance 0.8s ease-out;
+}
+
+.login-form-container .form-card,
+.forgot-form-container .form-card {
+    padding: 0;
+    box-shadow: none;
+    background: transparent;
+    max-width: 100%;
+    margin: 0;
+}
+
+.login-form-container .form-group,
+.forgot-form-container .form-group {
+    margin-bottom: 1.2rem;
+}
+
+.login-form-container input,
+.forgot-form-container input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.login-form-container .primary-btn,
+.forgot-form-container .primary-btn {
+    width: 100%;
+}
+
+@media (max-width: 500px) {
+    .login-form-container, .forgot-form-container {
+        max-width: 98vw;
+        padding: 1.2rem 0.3rem;
+    }
 }

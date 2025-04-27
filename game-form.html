@@ -11,10 +11,15 @@
     <script src="config.js"></script>
     <!-- Services -->
     <script src="services/database.js"></script>
-    <!-- Page Script -->
-    <script src="game-form.js"></script>
 </head>
 <body>
+    <script type="module">
+        import { requireAuth } from './auth-guard.js';
+        document.addEventListener('DOMContentLoaded', async () => {
+            await requireAuth('login.html');
+        });
+    </script>
+
     <div class="form-container">
         <form id="gameForm" class="form-card">
             <div class="form-header">
@@ -70,5 +75,32 @@
             <button type="submit" class="submit-btn" id="submitBtn">Criar Pelada</button>
         </form>
     </div>
+
+    <div id="profileMenu" class="profile-menu">
+        <ul>
+            <li><button class="profile-menu-btn" onclick="window.location.href='profile.html'">Perfil</button></li>
+            <li><button class="profile-menu-btn" onclick="window.location.href='admin/organizers.html'">Organizadores</button></li>
+            <li><button class="profile-menu-btn" onclick="alert('Em breve: configurações!')">Configurações</button></li>
+            <li><button id="logoutBtn" class="logout-btn profile-menu-btn">Sair</button></li>
+        </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async function() {
+                    if (window.supabase) {
+                        await supabase.auth.signOut();
+                        window.location.href = 'login.html';
+                    } else {
+                        alert('Erro ao sair: Supabase não carregado.');
+                    }
+                });
+            }
+        });
+    </script>
+    <!-- Page Script -->
+    <script src="game-form.js"></script>
 </body>
 </html>

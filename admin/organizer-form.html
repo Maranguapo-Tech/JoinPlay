@@ -41,7 +41,26 @@
             <button type="submit" class="primary-btn submit-btn" id="submitBtn">Salvar</button>
         </form>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config.js"></script>
+    <script src="../services/database.js"></script>
+    <script type="module">
+        import { requireRoleIframe } from '../../auth-guard.js';
+        document.addEventListener('DOMContentLoaded', async () => {
+            await requireRoleIframe('admin', '../../login.html', '../../index.html');
+        });
+    </script>
     <script>
+    // Função para gerar senha aleatória segura
+    function generateTempPassword(length = 10) {
+        const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
+        let pass = '';
+        for (let i = 0, n = charset.length; i < length; ++i) {
+            pass += charset.charAt(Math.floor(Math.random() * n));
+        }
+        return pass;
+    }
+
     // Sincroniza tema com a página pai
     window.addEventListener('message', (event) => {
         if (event.data && event.data.type === 'themeChange') {
@@ -51,20 +70,61 @@
             closeModal();
         }
     });
-    function closeModal() {
-        window.parent.postMessage('closeModal', '*');
+
+    function getUrlParam(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
     }
-    // Previne envio real, só fecha o modal
-    document.getElementById('organizerForm').addEventListener('submit', function(e) {
+
+    async function fillFormIfEdit() {
+        const id = getUrlParam('id');
+        if (id) {
+            try {
+                const profile = await db.getProfile(id);
+                document.getElementById('organizerName').value = profile.name || '';
+                document.getElementById('organizerEmail').value = profile.email || '';
+                document.getElementById('organizerPhone').value = profile.phone || '';
+                document.getElementById('organizerRole').value = profile.role || 'member';
+                document.getElementById('formTitle').textContent = 'Editar Organizador';
+                document.getElementById('submitBtn').textContent = 'Salvar Alterações';
+            } catch (error) {
+                alert('Erro ao carregar organizador: ' + error.message);
+            }
+        }
+    }
+
+    fillFormIfEdit();
+
+    document.getElementById('organizerForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const name = document.getElementById('organizerName').value;
         const email = document.getElementById('organizerEmail').value;
         const phone = document.getElementById('organizerPhone').value;
         const role = document.getElementById('organizerRole').value;
-        // Aqui você pode enviar name, email, phone e role para o backend ou parent
-        window.parent.postMessage({ type: 'newOrganizer', data: { name, email, phone, role } }, '*');
-        window.parent.postMessage('closeModal', '*');
+        const id = getUrlParam('id');
+        try {
+            if (id) {
+                await db.updateOrganizer(id, { name, email, phone, role });
+            } else {
+                // Gera senha temporária
+                const tempPassword = generateTempPassword();
+                // Cria usuário no Supabase Auth
+                const { user } = await db.signUp(email, tempPassword);
+                // Cria perfil com o mesmo id do usuário
+                await db.createOrganizer({ id: user.id, name, email, phone, role });
+                // Envia email de boas-vindas com senha temporária
+                await db.sendWelcomeEmail(email, name, tempPassword);
+            }
+            window.parent.postMessage({ type: 'refreshOrganizers' }, '*');
+            window.parent.postMessage('closeModal', '*');
+        } catch (error) {
+            alert('Erro ao salvar organizador: ' + (error.message || error.description || error));
+        }
     });
+
+    function closeModal() {
+        window.parent.postMessage('closeModal', '*');
+    }
     </script>
 </body>
 </html>
