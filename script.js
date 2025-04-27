@@ -215,3 +215,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initial load
     await loadGames();
 });
+
+// Dropdown menu do botão de perfil - executa sempre
+function setupProfileMenu() {
+    const profileBtn = document.getElementById('profileBtn');
+    const profileMenu = document.getElementById('profileMenu');
+    if (profileBtn && profileMenu) {
+        profileBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            profileMenu.classList.toggle('active');
+        });
+        // Fecha o menu ao clicar fora
+        document.addEventListener('click', function(e) {
+            if (profileMenu.classList.contains('active')) {
+                profileMenu.classList.remove('active');
+            }
+        });
+        // Impede que o menu feche ao clicar dentro dele
+        profileMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+}
+
+// Executa ao carregar o DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupProfileMenu);
+} else {
+    setupProfileMenu();
+}

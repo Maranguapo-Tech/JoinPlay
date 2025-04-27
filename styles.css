@@ -26,9 +26,6 @@
 
 /* Dark mode toggle button */
 .theme-toggle {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -653,6 +650,100 @@ input:focus, select:focus {
 
 [data-theme="dark"] .admin-organizers .moon-icon {
     display: block;
+}
+
+/* Top actions: tema + perfil */
+.top-actions {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 1100;
+}
+
+/* Ajuste botão de perfil com nome */
+.profile-toggle {
+    border-radius: 20px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    height: 40px;
+}
+
+@media (max-width: 600px) {
+    .profile-toggle {
+        padding: 0 10px;
+        font-size: 0.95rem;
+    }
+}
+
+.profile-name {
+    margin-left: 8px;
+    font-size: 1em;
+    font-weight: 500;
+    white-space: nowrap;
+    color: var(--text-color);
+}
+
+@media (max-width: 600px) {
+    .top-actions {
+        top: 0.5rem;
+        right: 0.5rem;
+        gap: 0.3rem;
+    }
+    .profile-toggle {
+        padding: 0 10px;
+        font-size: 0.95rem;
+    }
+    .profile-name {
+        font-size: 0.95em;
+    }
+}
+
+/* Dropdown menu do botão de perfil */
+.profile-menu {
+    display: none;
+    position: absolute;
+    top: 52px;
+    right: 0;
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    min-width: 150px;
+    z-index: 1200;
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    transition: opacity 0.15s;
+}
+.profile-menu.active {
+    display: block;
+}
+.profile-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.profile-menu li {
+    width: 100%;
+}
+.profile-menu a {
+    display: block;
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 0.7em 1.2em;
+    border-radius: 8px;
+    transition: background 0.15s;
+}
+.profile-menu a:hover {
+    background: var(--primary-color);
+    color: #fff;
 }
 
 /* Animations */
