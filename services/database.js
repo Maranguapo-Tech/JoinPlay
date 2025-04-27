@@ -39,9 +39,14 @@ class DatabaseService {
     // Games methods
     async createGame(gameData) {
         await this.initialize();
+        // Associate game with current user
+        const { data: userRes, error: userErr } = await this.supabase.auth.getUser();
+        if (userErr) throw userErr;
+        const userId = userRes.user.id;
+        const payload = { ...gameData, user_id: userId };
         const { data, error } = await this.supabase
             .from('games')
-            .insert([gameData])
+            .insert([payload])
             .select();
         if (error) throw error;
         return data[0];
@@ -49,9 +54,11 @@ class DatabaseService {
 
     async getGames() {
         await this.initialize();
+        // Fetch games (RLS will filter based on role)
         const { data, error } = await this.supabase
             .from('games')
-            .select('*')
+            // Include organizer profile name via RLS and foreign key
+            .select('*, profiles(name)')
             .order('created_at', { ascending: false });
         if (error) throw error;
         return data;

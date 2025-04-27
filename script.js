@@ -7,6 +7,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profileData = await db.getProfile(user.id);
         const firstName = (profileData.name || '').split(' ')[0] || '';
         document.querySelectorAll('.profile-name').forEach(el => el.textContent = firstName);
+
+        // Hide 'Organizadores' in profile menu for non-admin users
+        if (profileData.role !== 'admin') {
+            const orgBtn = document.querySelector("button.profile-menu-btn[onclick*='admin/organizers.html']");
+            if (orgBtn && orgBtn.parentElement) orgBtn.parentElement.remove();
+        }
+
     } catch (e) {
         console.warn('Could not load profile name', e);
     }
@@ -156,6 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <p><strong>Horário:</strong> ${game.time}</p>
                         <p><strong>Mensalistas:</strong> ${game.monthlyPlayers}</p>
                         <p><strong>Diária:</strong> R$ ${game.dailyFee}</p>
+                        <p><strong>Organizador:</strong> ${game.profiles?.name || ''}</p>
                     </div>
                 </div>
             `).join('');
