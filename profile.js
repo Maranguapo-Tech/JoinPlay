@@ -71,11 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const profileData = {
             name: document.getElementById('name').value,
-            nickname: document.getElementById('nickname').value,
             email: document.getElementById('email').value,
-            phone: document.getElementById('phone').value,
-            position: document.getElementById('position').value,
-            whatsappNotifications: document.getElementById('whatsappNotifications').checked
+            phone: document.getElementById('phone').value
         };
 
         try {
@@ -103,30 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Erro ao atualizar perfil. Por favor, tente novamente.');
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
-        }
-    });
-
-    // Avatar change button
-    const changeAvatarBtn = document.querySelector('.change-avatar-btn');
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    
-    changeAvatarBtn.addEventListener('click', () => {
-        fileInput.click();
-    });
-    
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-                const avatarPlaceholder = document.querySelector('.avatar-placeholder');
-                avatarPlaceholder.innerHTML = `<img src="${e.target.result}" alt="Profile Picture">`;
-                avatarPlaceholder.classList.add('has-image');
-            };
-            
-            reader.readAsDataURL(e.target.files[0]);
         }
     });
 });

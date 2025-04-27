@@ -13,19 +13,32 @@
                 <h2 id="formTitle">Novo Organizador</h2>
                 <button type="button" class="close-button" onclick="closeModal()">&times;</button>
             </div>
-            <div class="form-group">
-                <label for="organizerName">Nome</label>
-                <input type="text" id="organizerName" required placeholder="Nome do organizador">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="organizerName">Nome</label>
+                    <input type="text" id="organizerName" required placeholder="Nome do organizador">
+                </div>
+                <div class="form-group">
+                    <label for="organizerEmail">E-mail</label>
+                    <input type="email" id="organizerEmail" required placeholder="email@exemplo.com">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="organizerEmail">E-mail</label>
-                <input type="email" id="organizerEmail" required placeholder="email@exemplo.com">
+            <div class="form-row">
+                <div class="form-group" style="width:100%">
+                    <label for="organizerPhone">Telefone</label>
+                    <input type="text" id="organizerPhone" required placeholder="(99) 99999-9999">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="organizerPhone">Telefone</label>
-                <input type="text" id="organizerPhone" required placeholder="(99) 99999-9999">
+            <div class="form-row">
+                <div class="form-group" style="width:100%">
+                    <label for="organizerRole">Função</label>
+                    <select id="organizerRole" required>
+                        <option value="member">Membro</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
             </div>
-            <button type="submit" class="primary-btn" id="submitBtn">Salvar</button>
+            <button type="submit" class="primary-btn submit-btn" id="submitBtn">Salvar</button>
         </form>
     </div>
     <script>
@@ -44,6 +57,12 @@
     // Previne envio real, só fecha o modal
     document.getElementById('organizerForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        const name = document.getElementById('organizerName').value;
+        const email = document.getElementById('organizerEmail').value;
+        const phone = document.getElementById('organizerPhone').value;
+        const role = document.getElementById('organizerRole').value;
+        // Aqui você pode enviar name, email, phone e role para o backend ou parent
+        window.parent.postMessage({ type: 'newOrganizer', data: { name, email, phone, role } }, '*');
         window.parent.postMessage('closeModal', '*');
     });
     </script>
