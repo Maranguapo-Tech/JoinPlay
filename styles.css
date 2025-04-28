@@ -10,6 +10,7 @@
     --input-border: #ddd;
     --overlay-color: rgba(0, 0, 0, 0.5);
     --hover-color: rgba(0, 0, 0, 0.05);
+    --danger-color: #d32f2f;
 }
 
 [data-theme="dark"] {
@@ -22,6 +23,7 @@
     --input-border: #404040;
     --overlay-color: rgba(0, 0, 0, 0.7);
     --hover-color: rgba(255, 255, 255, 0.05);
+    --danger-color: #e57373;
 }
 
 /* Dark mode toggle button */
@@ -289,7 +291,7 @@ input:focus, select:focus {
     background: var(--background-color);
     border-radius: 8px;
     padding: 1rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease;
     animation: fadeIn 0.3s ease-out, scaleIn 0.3s ease-out;
     display: flex;
     flex-wrap: wrap;
@@ -303,7 +305,6 @@ input:focus, select:focus {
 
 .game-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .game-header {
@@ -311,6 +312,7 @@ input:focus, select:focus {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
+    width: 100%;
 }
 
 .game-header h3 {
@@ -825,6 +827,109 @@ input:focus, select:focus {
     }
 }
 
+/* Participants section styling */
+.participants-section {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    position: relative;
+}
+.participants-section h3 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+.participant-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+.participant-row input[type="text"] {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background: var(--background-color);
+    color: var(--text-color);
+}
+.participant-row .remove-btn {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+}
+
+.participants-section .section-header {
+    position: relative;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+.participants-section .section-header .edit-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Empty state for participant rows */
+.participant-rows .empty-state {
+    text-align: center;
+    color: var(--input-border);
+    padding: 1rem;
+}
+
+/* Static participant cards */
+.participant-static {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+.participant-card {
+    background: var(--card-background);
+    padding: 0.5rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.participant-card .name {
+    font-weight: 600;
+    color: var(--text-color);
+}
+.participant-card .phone {
+    color: var(--secondary-color);
+    font-size: 0.95rem;
+}
+@media (max-width: 600px) {
+    .participant-static {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Danger style for Atualizar Mensalistas */
+#saveParticipantsBtn {
+    background: var(--danger-color);
+    color: #fff;
+    border: none;
+}
+#saveParticipantsBtn:hover {
+    opacity: 0.9;
+}
+
 /* Animations */
 @keyframes logoEntrance {
     from {
@@ -1154,4 +1259,11 @@ input:focus, select:focus {
     .profile-name {
         font-size: 0.95em;
     }
+}
+
+/* Highlight game-card in details page */
+.details-container .game-card {
+    background: var(--card-background);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
 }

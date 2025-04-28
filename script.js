@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <p><strong>Local:</strong> ${game.location}</p>
                         <p><strong>Dia:</strong> ${game.weekDay}</p>
                         <p><strong>Horário:</strong> ${game.time}</p>
-                        <p><strong>Mensalistas:</strong> ${game.monthlyPlayers}</p>
+                        <p><strong>Mensalistas:</strong> ${game.participants?.length || 0}/${game.monthlyPlayers}</p>
                         <p><strong>Diária:</strong> R$ ${game.dailyFee}</p>
                         <p><strong>Organizador:</strong> ${game.profiles?.name || ''}</p>
                         <p><strong>Dia Renovação:</strong> ${game.renewal_day_of_month || '-'}</p>
@@ -222,6 +222,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (game) {
                         handleDeleteGame(game);
                     }
+                });
+            });
+
+            // Navigate to details page on card click
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.addEventListener('click', e => {
+                    // Ignore clicks on action buttons
+                    if (e.target.closest('.action-btn')) return;
+                    const gid = card.querySelector('.edit-btn').dataset.gameId;
+                    window.location.href = `game-details.html?id=${gid}`;
                 });
             });
 

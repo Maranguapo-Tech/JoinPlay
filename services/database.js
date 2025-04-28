@@ -54,11 +54,10 @@ class DatabaseService {
 
     async getGames() {
         await this.initialize();
-        // Fetch games (RLS will filter based on role)
+        // Fetch games with organizer name and participants list for counts
         const { data, error } = await this.supabase
             .from('games')
-            // Include organizer profile name via RLS and foreign key
-            .select('*, profiles(name)')
+            .select('*, profiles(name), participants(id)')
             .order('created_at', { ascending: false });
         if (error) throw error;
         return data;
@@ -145,6 +144,64 @@ class DatabaseService {
             .from('profiles')
             .delete()
             .eq('id', id);
+        if (error) throw error;
+    }
+
+    // Participants methods
+    async createParticipants(gameId, participants) {
+        await this.initialize();
+        const payload = participants.map(p => ({
+            name: p.name,
+            phone: p.phone,
+            game_id: gameId,
+            payment_status: p.payment_status || false,
+            ref_month: p.ref_month || null
+        }));
+        const { data, error } = await this.supabase
+            .from('participants')
+            .insert(payload);
+        if (error) throw error;
+        return data;
+    }
+
+    async getParticipants(gameId) {
+        await this.initialize();
+        const { data, error } = await this.supabase
+            .from('participants')
+            .select('*')
+            .eq('game_id', gameId);
+        if (error) throw error;
+        return data;
+    }
+
+    async updateParticipant(id, updates) {
+        await this.initialize();
+        const { data, error } = await this.supabase
+            .from('participants')
+            .update(updates)
+            .eq('id', id);
+        if (error) throw error;
+        return data;
+    }
+
+    async deleteParticipant(id) {
+        await this.initialize();
+        const { error } = await this.supabase
+            .from('participants')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+    }
+
+    // Bulk delete participants by game and reference month
+    async deleteParticipantsByMonth(gameId, refMonth) {
+        console.log("entrando no método de deleção", gameId, refMonth);
+        await this.initialize();
+        const { error } = await this.supabase
+            .from('participants')
+            .delete()
+            .eq('game_id', gameId)
+            .eq('ref_month', refMonth);
         if (error) throw error;
     }
 
